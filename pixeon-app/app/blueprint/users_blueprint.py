@@ -141,7 +141,6 @@ def update_user_by_id(user_id):
     abort(404)
 
 
-
 @bp.route('/<string:station_id>', methods=('DELETE',))
 def delete_user_by_id(station_id):
     """Deletes a user by public ID.
