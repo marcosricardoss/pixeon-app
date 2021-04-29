@@ -5,7 +5,7 @@ from .models import Exam, Order, Patient, Physician, User
 from .exam_repository import ExamRepository
 from .order_repository import OrderRepository
 from .patient_repository import PatientRepository
-from .physician_repository import PhysicianrRepository
+from .physician_repository import PhysicianRepository
 from .user_repository import UserRepository
 from .repository import Repository
 
@@ -18,7 +18,7 @@ __all__ = [
   "Patient",
   "PatientRepository",
   "Physician",
-  "PhysicianRepository"
+  "PhysicianRepository",
   "Repository",  
   "User",  
   "UserRepository"
