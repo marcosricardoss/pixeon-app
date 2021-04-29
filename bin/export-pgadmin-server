@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+PGADMIN_DEFAULT_EMAIL=email@com
+docker exec -it pixeon-pgadmin python /pgadmin4/setup.py --dump-servers /tmp/servers.json --user $PGADMIN_DEFAULT_EMAIL
+docker cp pixeon-pgadmin:/tmp/servers.json ./pgadmin

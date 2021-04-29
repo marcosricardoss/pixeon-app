@@ -1,0 +1,771 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Pixeon Application",
+    "description": "",
+    "termsOfService": "",
+    "contact": {
+      "email": "marcosricardo@gmail.com"
+    },
+    "license": {
+      "name": "Software proprietário"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "description": "Relative to the production API server",
+      "url": "/api/v1.0"
+    }
+  ],
+  "tags": [
+    {
+      "name": "users",
+      "description": "Operações relacionadas aos usuários registrados."
+    },
+    {
+      "name": "auth",
+      "description": "Operações relacionadas à aquisição de tokens."
+    }
+  ],
+  "paths": {
+    "/users": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Lista todos os usuários contidos no banco de dados",
+        "security": [
+          {
+            "jwt": [
+              "secret"
+            ]
+          }
+        ],
+        "operationId": "getUsers",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The number of items to skip before starting to collect the result set"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The numbers of items to return"
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "created_at",
+                "updated_at"
+              ]
+            },
+            "description": "The value used to sort the items"
+          },
+          {
+            "in": "query",
+            "name": "desc",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ]
+            },
+            "description": "Indicates the order sort"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "operação realizada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "metadata": {
+                      "$ref": "#/components/schemas/Metadata"
+                    },
+                    "users": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/UserFull"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing Authorization Header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP401Response"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP404Response"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Adiciona um novo usuário",
+        "security": [
+          {
+            "jwt": [
+              "secret"
+            ]
+          }
+        ],
+        "operationId": "addUser",
+        "requestBody": {
+          "description": "Objeto do usuário que a ser adicionado",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Operação realiza com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserFull"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP400Response"
+                },
+                "examples": {
+                  "Bad Request": {
+                    "value": {
+                      "status": "error",
+                      "message": "Bad request"
+                    }
+                  },
+                  "Invalid Input": {
+                    "value": {
+                      "status": "error",
+                      "code": 1,
+                      "message": "Invalid input",
+                      "erros": [
+                        {
+                          "message": "'2000' is not of type 'integer'",
+                          "property": "services.media.port",
+                          "validator": "type",
+                          "validator_value": "integer"
+                        },
+                        {
+                          "message": "'protocol' is a required property",
+                          "property": "services.scheduler",
+                          "validator": "required",
+                          "validator_value": [
+                            "protocol",
+                            "port",
+                            "path"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "Username already used": {
+                    "value": {
+                      "status": "error",
+                      "code": 101,
+                      "message": "The username is already being used"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing Authorization Header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP401Response"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/users/{userId}": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Recupera um usuário específicado pelo ID",
+        "description": "Retorna um único usuário",
+        "security": [
+          {
+            "jwt": [
+              "secret"
+            ]
+          }
+        ],
+        "operationId": "getUserById",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID do usuário a ser recuperado",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserFull"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing Authorization Header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP401Response"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP404Response"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Atualiza um usuário específicado pelo ID",
+        "security": [
+          {
+            "jwt": [
+              "secret"
+            ]
+          }
+        ],
+        "operationId": "updateUser",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID do usuário a ser recuperada",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 50
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Operação realiza com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserFull"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP400Response"
+                },
+                "examples": {
+                  "Bad Request": {
+                    "value": {
+                      "status": "error",
+                      "message": "Bad request"
+                    }
+                  },
+                  "Invalid Input": {
+                    "value": {
+                      "status": "error",
+                      "code": 1,
+                      "message": "Invalid input",
+                      "erros": [
+                        {
+                          "message": "'2000' is not of type 'integer'",
+                          "property": "services.media.port",
+                          "validator": "type",
+                          "validator_value": "integer"
+                        },
+                        {
+                          "message": "'protocol' is a required property",
+                          "property": "services.scheduler",
+                          "validator": "required",
+                          "validator_value": [
+                            "protocol",
+                            "port",
+                            "path"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "Username ialready used": {
+                    "value": {
+                      "status": "error",
+                      "code": 101,
+                      "message": "The username is already being used"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing Authorization Header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP401Response"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP404Response"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      },
+      "delete": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Apaga um usuário específicado pelo ID",
+        "security": [
+          {
+            "jwt": [
+              "secret"
+            ]
+          }
+        ],
+        "operationId": "deleteUser",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "ID do usuário a ser excluída",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 50
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Operação realizada com sucesso"
+          },
+          "401": {
+            "description": "Missing Authorization Header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP401Response"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP404Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Obtém tokens de autenticaçao do usuário.",
+        "operationId": "login",
+        "requestBody": {
+          "description": "Objeto do usuário que a ser adicionado",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "operação realizada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "tokens": {
+                      "type": "object",
+                      "properties": {
+                        "access": {
+                          "type": "string",
+                          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                        },
+                        "refresh": {
+                          "type": "string",
+                          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing Authorization Header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Login error. Invalid username or password."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Obtém um novo token de acesso.",
+        "security": [
+          {
+            "jwt_refresh": [
+              "secret"
+            ]
+          }
+        ],
+        "operationId": "refresh",
+        "responses": {
+          "200": {
+            "description": "operação realizada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "tokens": {
+                      "type": "object",
+                      "properties": {
+                        "access": {
+                          "type": "string",
+                          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing Authorization Header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP401Response"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "required": [
+          "username",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "maxLength": 50
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 256
+          }
+        }
+      },
+      "UserFull": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/User"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "created_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updated_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ]
+      },
+      "Metadata": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "maxLength": 1000,
+            "example": "'2000' is not of type 'integer'"
+          },
+          "property": {
+            "type": "string",
+            "example": "services.media.port"
+          },
+          "validator_value": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "validator": {
+            "type": "string",
+            "example": "type"
+          }
+        }
+      },
+      "HTTP400Response": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "error",
+            "enum": [
+              "error",
+              "fail"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "example": "Bad request"
+          }
+        }
+      },
+      "HTTP401Response": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "error",
+            "enum": [
+              "error",
+              "fail"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "example": "Missing authorization header"
+          }
+        }
+      },
+      "HTTP404Response": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "error",
+            "enum": [
+              "error",
+              "fail"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "example": "Not found"
+          }
+        }
+      },
+      "HTTP405Response": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "error",
+            "enum": [
+              "error",
+              "fail"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "example": "Method not allowed"
+          }
+        }
+      },
+      "HTTP409Response": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "error",
+            "enum": [
+              "error",
+              "fail"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "example": "State conflict"
+          }
+        }
+      },
+      "HTTP500Response": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "fail",
+            "enum": [
+              "error",
+              "fail"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "example": "Internal server error"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "jwt": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "jwt_refresh": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

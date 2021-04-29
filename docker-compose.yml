@@ -1,0 +1,97 @@
+version: "3.2"
+services:
+  pixeon-proxy:
+    container_name: pixeon-proxy
+    restart: always    
+    image: jwilder/nginx-proxy:latest
+    logging:
+      driver: none
+    ports:
+      - "${PROXY_SERVICE_PORT}:80"
+    volumes:
+      - "/var/run/docker.sock:/tmp/docker.sock:ro"      
+
+  pixeon-postgres:    
+    image: postgres:latest
+    container_name: pixeon-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: $POSTGRES_SERVICE_DATABASE_NAME
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_PASSWORD: $POSTGRES_SERVICE_PASSWORD
+    logging:
+      driver: none
+    ports:
+      - "${POSTGRES_SERVICE_PORT}:5432"
+    volumes:
+      - pixeon:/var/lib/postgresql/data
+
+  pixeon-pgadmin:
+    image: pixeon-pgadmin:latest
+    container_name: pixeon-pgadmin
+    restart: always
+    build:
+      context: ./pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: $PGADMIN_DEFAULT_EMAIL
+      PGADMIN_DEFAULT_PASSWORD: $PGADMIN_DEFAULT_PASSWORD
+    ports:
+      - "${PGADMIN_DEFAULT_PORT}:80"
+    logging:
+      driver: none    
+    depends_on:      
+      - pixeon-postgres
+
+  pixeon-app:
+    container_name: pixeon-app
+    restart: always
+    build:
+      context: ./pixeon-app
+      args:
+        BUILD_ENV: $ENV                 
+    image: pixeon-app:latest    
+    environment:      
+      APP_DEFAULT_PASS: $APP_DEFAULT_PASS
+      APP_DEFAULT_USERNAME: $APP_DEFAULT_USERNAME
+      DATABASE_NAME: $POSTGRES_SERVICE_DATABASE_NAME
+      DATABASE_PASSWORD: $POSTGRES_SERVICE_PASSWORD
+      DATABASE_URL: "postgresql+psycopg2://postgres:${POSTGRES_SERVICE_PASSWORD}@pixeon-postgres:5432/${POSTGRES_SERVICE_DATABASE_NAME}" 
+      FLASK_APP: app
+      FLASK_ENV: $ENV
+      FLASK_PORT: 5000                        
+      SECRET_KEY: $SECRET_KEY
+      VIRTUAL_HOST: "${APP_SERVICE_HOST}.${DOMAIN}"
+      VIRTUAL_PORT: 5000
+    command: >
+      bash -c "/usr/src/pixeon/wait-for-it pixeon-postgres:5432 
+      && /usr/src/pixeon/start"
+    volumes:      
+      - "./pixeon-app/app:/usr/src/pixeon/app"
+      - "./pixeon-app/data:/usr/src/pixeon/data"
+      - "./pixeon-app/migrations:/usr/src/pixeon/migrations"
+      - "./pixeon-app/instance:/usr/src/pixeon/instance"
+      - "./pixeon-app/tests:/usr/src/pixeon/tests"
+      - "./pixeon-app/spec:/usr/src/pixeon/spec"
+      - "./pixeon-app/htmlcov:/usr/src/pixeon/htmlcov"
+    ports:
+      - "${APP_SERVICE_PORT}:5000"
+    depends_on:
+      - pixeon-proxy
+      - pixeon-postgres      
+  
+  pixeon-swagger:
+    container_name: pixeon-swagger
+    restart: always
+    image: swaggerapi/swagger-ui:latest
+    environment:
+      API_URL: "http://${DOMAIN}:${APP_SERVICE_PORT}/api/v1.0/spec/openapi.yaml"
+      VIRTUAL_HOST: "${SWAGGER_SERVICE_HOST}.${DOMAIN}"
+      VIRTUAL_PORT: 8080
+    ports:
+      - "${SWAGGER_SERVICE_PORT}:8080"
+    depends_on:
+      - pixeon-proxy
+      - pixeon-app
+
+volumes:    
+  pixeon:         
