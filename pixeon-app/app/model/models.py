@@ -9,7 +9,8 @@ import pytz
 from datetime import datetime
 from pytz.reference import UTC
 
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table
+from sqlalchemy.orm import relationship
 from app.database import Base
 
 
@@ -37,6 +38,11 @@ class CreationModificationDateMixin(object):
     created_at = Column(DateTime(), default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime())  
 
+
+association_exam_order = Table('exame_order', Base.metadata,
+                                Column('order_id', Integer, ForeignKey('order.id')),
+                                Column('exam_id', Integer, ForeignKey('exam.id')))
+                                
 
 class User(Base, Model, CreationModificationDateMixin):
     """ User's model class.
@@ -89,7 +95,8 @@ class Physician(Base, Model, CreationModificationDateMixin):
 
     id = Column(Integer, primary_key=True)
     public_id = Column(String(50), unique=True, nullable=False)
-    name = Column(String(250), nullable=False)    
+    name = Column(String(250), nullable=False)        
+    exams = relationship("Exam", backref='physician')
 
     def serialize(self, timezone=UTC) -> dict:
         """Serialize the object attributes values into a dictionary.
@@ -126,6 +133,7 @@ class Patient(Base, Model, CreationModificationDateMixin):
     id = Column(Integer, primary_key=True)
     public_id = Column(String(50), unique=True, nullable=False)
     name = Column(String(250), nullable=False)    
+    orders = relationship("Order", backref='patient')
 
     def serialize(self, timezone=UTC) -> dict:
         """Serialize the object attributes values into a dictionary.
@@ -161,6 +169,10 @@ class Order(Base, Model, CreationModificationDateMixin):
 
     id = Column(Integer, primary_key=True)
     public_id = Column(String(50), unique=True, nullable=False)    
+    patient_id = Column(Integer, ForeignKey('patient.id'))
+    exams = relationship("Exam",
+                            secondary=association_exam_order,                            
+                            backref="orders")
 
     def serialize(self, timezone=UTC) -> dict:
         """Serialize the object attributes values into a dictionary.
@@ -193,6 +205,7 @@ class Exam(Base, Model, CreationModificationDateMixin):
     id = Column(Integer, primary_key=True)
     public_id = Column(String(50), unique=True, nullable=False)
     name = Column(String(250), nullable=False)    
+    physician_id = Column(Integer, ForeignKey('physician.id'))
 
     def serialize(self, timezone=UTC) -> dict:
         """Serialize the object attributes values into a dictionary.
