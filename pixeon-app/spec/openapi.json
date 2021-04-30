@@ -14,18 +14,38 @@
   },
   "servers": [
     {
-      "description": "Relative to the production API server",
+      "description": "URL relative to the API application",
       "url": "/api/v1.0"
+    },
+    {
+      "description": "URL absolute to the production API server",
+      "url": "http://pixeon.localhost/api/v1.0"
     }
   ],
   "tags": [
     {
       "name": "users",
-      "description": "Operações relacionadas aos usuários registrados."
+      "description": ""
     },
     {
       "name": "auth",
-      "description": "Operações relacionadas à aquisição de tokens."
+      "description": ""
+    },
+    {
+      "name": "physicians",
+      "description": ""
+    },
+    {
+      "name": "patients",
+      "description": ""
+    },
+    {
+      "name": "order",
+      "description": ""
+    },
+    {
+      "name": "exams",
+      "description": ""
     }
   ],
   "paths": {
@@ -34,7 +54,7 @@
         "tags": [
           "users"
         ],
-        "summary": "Lista todos os usuários contidos no banco de dados",
+        "summary": "Get the list of all registered users",
         "security": [
           {
             "jwt": [
@@ -86,7 +106,7 @@
         ],
         "responses": {
           "200": {
-            "description": "operação realizada com sucesso",
+            "description": "operation performed successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -131,7 +151,7 @@
         "tags": [
           "users"
         ],
-        "summary": "Adiciona um novo usuário",
+        "summary": "Add a new user",
         "security": [
           {
             "jwt": [
@@ -141,7 +161,7 @@
         ],
         "operationId": "addUser",
         "requestBody": {
-          "description": "Objeto do usuário que a ser adicionado",
+          "description": "User data to be added",
           "content": {
             "application/json": {
               "schema": {
@@ -153,7 +173,7 @@
         },
         "responses": {
           "200": {
-            "description": "Operação realiza com sucesso",
+            "description": "operation performed successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -183,19 +203,17 @@
                       "message": "Invalid input",
                       "erros": [
                         {
-                          "message": "'2000' is not of type 'integer'",
-                          "property": "services.media.port",
-                          "validator": "type",
-                          "validator_value": "integer"
+                          "message": "'username' is a required property",
+                          "property": "",
+                          "validator": "required"
                         },
                         {
-                          "message": "'protocol' is a required property",
-                          "property": "services.scheduler",
+                          "message": "'password' is a required property",
+                          "property": "",
                           "validator": "required",
                           "validator_value": [
-                            "protocol",
-                            "port",
-                            "path"
+                            "username",
+                            "passwor"
                           ]
                         }
                       ]
@@ -231,8 +249,8 @@
         "tags": [
           "users"
         ],
-        "summary": "Recupera um usuário específicado pelo ID",
-        "description": "Retorna um único usuário",
+        "summary": "Retrieves a user specified by ID",
+        "description": "Returns a user's JSON object",
         "security": [
           {
             "jwt": [
@@ -245,7 +263,7 @@
           {
             "name": "userId",
             "in": "path",
-            "description": "ID do usuário a ser recuperado",
+            "description": "User ID to be retrieved",
             "required": true,
             "schema": {
               "type": "string",
@@ -255,7 +273,7 @@
         ],
         "responses": {
           "200": {
-            "description": "successful operation",
+            "description": "operation performed successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -290,7 +308,7 @@
         "tags": [
           "users"
         ],
-        "summary": "Atualiza um usuário específicado pelo ID",
+        "summary": "Updates a user specified by ID",
         "security": [
           {
             "jwt": [
@@ -303,7 +321,7 @@
           {
             "name": "userId",
             "in": "path",
-            "description": "ID do usuário a ser recuperada",
+            "description": "User ID to be updated",
             "required": true,
             "schema": {
               "type": "string",
@@ -322,7 +340,7 @@
         },
         "responses": {
           "200": {
-            "description": "Operação realiza com sucesso",
+            "description": "operation performed successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -352,19 +370,17 @@
                       "message": "Invalid input",
                       "erros": [
                         {
-                          "message": "'2000' is not of type 'integer'",
-                          "property": "services.media.port",
-                          "validator": "type",
-                          "validator_value": "integer"
+                          "message": "'username' is a required property",
+                          "property": "",
+                          "validator": "required"
                         },
                         {
-                          "message": "'protocol' is a required property",
-                          "property": "services.scheduler",
+                          "message": "'password' is a required property",
+                          "property": "",
                           "validator": "required",
                           "validator_value": [
-                            "protocol",
-                            "port",
-                            "path"
+                            "username",
+                            "passwor"
                           ]
                         }
                       ]
@@ -408,7 +424,7 @@
         "tags": [
           "users"
         ],
-        "summary": "Apaga um usuário específicado pelo ID",
+        "summary": "Deletes a user specified by ID",
         "security": [
           {
             "jwt": [
@@ -421,7 +437,7 @@
           {
             "name": "userId",
             "in": "path",
-            "description": "ID do usuário a ser excluída",
+            "description": "User ID to be deleted",
             "required": true,
             "schema": {
               "type": "string",
@@ -431,7 +447,7 @@
         ],
         "responses": {
           "204": {
-            "description": "Operação realizada com sucesso"
+            "description": "operation performed successfully"
           },
           "401": {
             "description": "Missing Authorization Header",
@@ -461,10 +477,10 @@
         "tags": [
           "auth"
         ],
-        "summary": "Obtém tokens de autenticaçao do usuário.",
+        "summary": "Gets access tokens for the user",
         "operationId": "login",
         "requestBody": {
-          "description": "Objeto do usuário que a ser adicionado",
+          "description": "JSON object with user's username and password",
           "content": {
             "application/json": {
               "schema": {
@@ -476,7 +492,7 @@
         },
         "responses": {
           "200": {
-            "description": "operação realizada com sucesso",
+            "description": "operation performed successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -527,7 +543,7 @@
         "tags": [
           "auth"
         ],
-        "summary": "Obtém um novo token de acesso.",
+        "summary": "Gets an access token using the refresh token",
         "security": [
           {
             "jwt_refresh": [
@@ -538,7 +554,7 @@
         "operationId": "refresh",
         "responses": {
           "200": {
-            "description": "operação realizada com sucesso",
+            "description": "operation performed successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -570,6 +586,402 @@
         },
         "x-codegen-request-body-name": "body"
       }
+    },
+    "/physician": {
+      "get": {
+        "tags": [
+          "physicians"
+        ],
+        "summary": "Get the list of all registered physicians",
+        "security": [
+          {
+            "jwt": [
+              "secret"
+            ]
+          }
+        ],
+        "operationId": "getPhysicians",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The number of items to skip before starting to collect the result set"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The numbers of items to return"
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "created_at",
+                "updated_at"
+              ]
+            },
+            "description": "The value used to sort the items"
+          },
+          {
+            "in": "query",
+            "name": "desc",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ]
+            },
+            "description": "Indicates the order sort"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "operation performed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "metadata": {
+                      "$ref": "#/components/schemas/Metadata"
+                    },
+                    "physicians": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PhysicianFull"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing Authorization Header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP401Response"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP404Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/patient": {
+      "get": {
+        "tags": [
+          "patients"
+        ],
+        "summary": "Get the list of all registered patients",
+        "security": [
+          {
+            "jwt": [
+              "secret"
+            ]
+          }
+        ],
+        "operationId": "getPatients",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The number of items to skip before starting to collect the result set"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The numbers of items to return"
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "created_at",
+                "updated_at"
+              ]
+            },
+            "description": "The value used to sort the items"
+          },
+          {
+            "in": "query",
+            "name": "desc",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ]
+            },
+            "description": "Indicates the order sort"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "operation performed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "metadata": {
+                      "$ref": "#/components/schemas/Metadata"
+                    },
+                    "patients": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PatientFull"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing Authorization Header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP401Response"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP404Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/order": {
+      "get": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Get the list of registered orders",
+        "security": [
+          {
+            "jwt": [
+              "secret"
+            ]
+          }
+        ],
+        "operationId": "getOrder",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The number of items to skip before starting to collect the result set"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The numbers of items to return"
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "created_at",
+                "updated_at"
+              ]
+            },
+            "description": "The value used to sort the items"
+          },
+          {
+            "in": "query",
+            "name": "desc",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ]
+            },
+            "description": "Indicates the order sort"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "operation performed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "metadata": {
+                      "$ref": "#/components/schemas/Metadata"
+                    },
+                    "orders": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/OrderFull"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing Authorization Header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP401Response"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP404Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/exam": {
+      "get": {
+        "tags": [
+          "exams"
+        ],
+        "summary": "Get the list of registered exams",
+        "security": [
+          {
+            "jwt": [
+              "secret"
+            ]
+          }
+        ],
+        "operationId": "getExams",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The number of items to skip before starting to collect the result set"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The numbers of items to return"
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "created_at",
+                "updated_at"
+              ]
+            },
+            "description": "The value used to sort the items"
+          },
+          {
+            "in": "query",
+            "name": "desc",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1"
+              ]
+            },
+            "description": "Indicates the order sort"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "operation performed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "metadata": {
+                      "$ref": "#/components/schemas/Metadata"
+                    },
+                    "exams": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ExamFull"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing Authorization Header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP401Response"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTP404Response"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -599,6 +1011,148 @@
           {
             "type": "object",
             "properties": {
+              "public_id\"": {
+                "type": "string",
+                "example": "1b0e89c6a93611ebbd620242ac150005"
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updated_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ]
+      },
+      "Physician": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 250
+          }
+        }
+      },
+      "PhysicianFull": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Physician"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "public_id\"": {
+                "type": "string",
+                "example": "1b0e89c6a93611ebbd620242ac150005"
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updated_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ]
+      },
+      "Patient": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 250
+          }
+        }
+      },
+      "PatientFull": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Patient"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "public_id\"": {
+                "type": "string",
+                "example": "1b0e89c6a93611ebbd620242ac150005"
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updated_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ]
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 250
+          }
+        }
+      },
+      "OrderFull": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Order"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "public_id\"": {
+                "type": "string",
+                "example": "1b0e89c6a93611ebbd620242ac150005"
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updated_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        ]
+      },
+      "Exam": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 250
+          }
+        }
+      },
+      "ExamFull": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Exam"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "public_id\"": {
+                "type": "string",
+                "example": "1b0e89c6a93611ebbd620242ac150005"
+              },
               "created_at": {
                 "type": "string",
                 "format": "date-time"
@@ -625,30 +1179,6 @@
           },
           "total": {
             "type": "integer"
-          }
-        }
-      },
-      "Error": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "maxLength": 1000,
-            "example": "'2000' is not of type 'integer'"
-          },
-          "property": {
-            "type": "string",
-            "example": "services.media.port"
-          },
-          "validator_value": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "validator": {
-            "type": "string",
-            "example": "type"
           }
         }
       },
