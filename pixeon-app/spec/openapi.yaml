@@ -22,7 +22,7 @@ tags:
     description: ''
   - name: patients
     description: ''
-  - name: order
+  - name: orders
     description: ''
   - name: exams
     description: ''
