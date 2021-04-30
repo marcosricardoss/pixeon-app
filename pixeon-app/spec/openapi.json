@@ -1011,7 +1011,7 @@
           {
             "type": "object",
             "properties": {
-              "public_id\"": {
+              "public_id": {
                 "type": "string",
                 "example": "1b0e89c6a93611ebbd620242ac150005"
               },
@@ -1047,7 +1047,7 @@
           {
             "type": "object",
             "properties": {
-              "public_id\"": {
+              "public_id": {
                 "type": "string",
                 "example": "1b0e89c6a93611ebbd620242ac150005"
               },
@@ -1083,7 +1083,7 @@
           {
             "type": "object",
             "properties": {
-              "public_id\"": {
+              "public_id": {
                 "type": "string",
                 "example": "1b0e89c6a93611ebbd620242ac150005"
               },
@@ -1116,7 +1116,7 @@
           {
             "type": "object",
             "properties": {
-              "public_id\"": {
+              "public_id": {
                 "type": "string",
                 "example": "1b0e89c6a93611ebbd620242ac150005"
               },
@@ -1149,7 +1149,7 @@
           {
             "type": "object",
             "properties": {
-              "public_id\"": {
+              "public_id": {
                 "type": "string",
                 "example": "1b0e89c6a93611ebbd620242ac150005"
               },

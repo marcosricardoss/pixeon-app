@@ -623,7 +623,7 @@ components:
         - $ref: '#/components/schemas/User'
         - type: object
           properties:
-            public_id": 
+            public_id: 
               type: string
               example: "1b0e89c6a93611ebbd620242ac150005"
             created_at:
@@ -645,7 +645,7 @@ components:
         - $ref: '#/components/schemas/Physician'
         - type: object
           properties:
-            public_id": 
+            public_id: 
               type: string
               example: "1b0e89c6a93611ebbd620242ac150005"
             created_at:
@@ -667,7 +667,7 @@ components:
         - $ref: '#/components/schemas/Patient'
         - type: object
           properties:
-            public_id": 
+            public_id: 
               type: string
               example: "1b0e89c6a93611ebbd620242ac150005"
             created_at:
@@ -687,7 +687,7 @@ components:
         - $ref: '#/components/schemas/Order'
         - type: object
           properties:
-            public_id": 
+            public_id: 
               type: string
               example: "1b0e89c6a93611ebbd620242ac150005"
             created_at:
@@ -707,7 +707,7 @@ components:
         - $ref: '#/components/schemas/Exam'
         - type: object
           properties:
-            public_id": 
+            public_id: 
               type: string
               example: "1b0e89c6a93611ebbd620242ac150005"
             created_at:
