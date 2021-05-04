@@ -26,6 +26,8 @@ tags:
     description: ''
   - name: exams
     description: ''
+  - name: database
+    description: ''
 paths:
   /users:
     get:
@@ -604,6 +606,47 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTP404Response'   
+  /status:
+    get:
+      tags:
+        - database
+      summary: Get the list of registered exams
+      security:
+        - jwt:
+            - secret
+      operationId: getStatus
+      responses:
+        '200':
+          description: operation performed successfully
+          content:
+            application/json:
+              schema:
+                properties:
+                  status: 
+                    type: string
+                    example: "down"
+                  msg: 
+                    type: string
+                    example: "The database is DOWN!"
+                  
+        '401':
+          description: Missing Authorization Header
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTP401Response'
+        '503':
+          description: Missing Authorization Header
+          content:
+            application/json:
+              schema:
+                properties:
+                  status: 
+                    type: string
+                    example: "down"
+                  msg: 
+                    type: string
+                    example: "The database is DOWN!"
 components:
   schemas:
     User:

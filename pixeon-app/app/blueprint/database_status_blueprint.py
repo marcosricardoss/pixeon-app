@@ -16,7 +16,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 bp = Blueprint('database_status', __name__)
 
 @bp.route('', methods=('GET',))
-# @jwt_required
+@jwt_required
 def status():
     """
     Checks the database connection, and retrieve 
