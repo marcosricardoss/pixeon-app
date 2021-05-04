@@ -64,7 +64,7 @@ def create_app(package_name: str = None, test_config: dict = {}) -> Flask:
     app.register_blueprint(patient_blueprint.bp, url_prefix=f"{app.config['API_BASE_PATH']}v1.0/patient")    
     app.register_blueprint(orders_blueprint.bp, url_prefix=f"{app.config['API_BASE_PATH']}v1.0/order")
     app.register_blueprint(exam_blueprint.bp, url_prefix=f"{app.config['API_BASE_PATH']}v1.0/exam")
-    app.register_blueprint(database_status_blueprint.bp, url_prefix=f"{app.config['API_BASE_PATH']}v1.0/database")
+    app.register_blueprint(database_status_blueprint.bp, url_prefix=f"{app.config['API_BASE_PATH']}v1.0/status")
 
     # cors
     cors = CORS(app, resources={r"{}*".format(app.config['API_BASE_PATH'])},

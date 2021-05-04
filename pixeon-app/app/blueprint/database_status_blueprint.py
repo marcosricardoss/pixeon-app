@@ -15,7 +15,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 bp = Blueprint('database_status', __name__)
 
-@bp.route('/status', methods=('GET',))
+@bp.route('', methods=('GET',))
 # @jwt_required
 def status():
     """
@@ -25,21 +25,19 @@ def status():
     Returns:
     response: flask.Response object with the application/json mimetype.
     """    
-
-    status = None
+    
     try:
         # DATABASE_URL = postgresql+psycopg2://postgres:123456@pixeon-postgres:5432/pixeon
         engine = create_engine(os.environ.get('DATABASE_URL'))
         engine.connect()
         return make_response(jsonify({                
-            'status': "up"
+            'status': "up",
             'msg': "The database is UP!"
-        }), 200)
-        status = 
+        }), 200)        
     except BaseException as e:
         return make_response(jsonify({                
-            'status': "down"
-            'msg': "The database is UP!"
+            'status': "down",
+            'msg': "The database is DOWN!"
         }), 503)
 
     
