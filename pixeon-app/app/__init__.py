@@ -22,6 +22,7 @@ from app.authentication import init_authentication
 from app.blueprint.handlers import register_handler
 from app.blueprint import ( 
     auth_blueprint, 
+    database_status_blueprint,
     exam_blueprint,
     index_blueprint, 
     orders_blueprint,
@@ -58,10 +59,12 @@ def create_app(package_name: str = None, test_config: dict = {}) -> Flask:
     app.register_blueprint(spec_blueprint.bp, url_prefix=f"{app.config['API_BASE_PATH']}v1.0/spec")            
     app.register_blueprint(auth_blueprint.bp, url_prefix=f"{app.config['API_BASE_PATH']}v1.0/auth")            
     app.register_blueprint(users_blueprint.bp, url_prefix=f"{app.config['API_BASE_PATH']}v1.0/users")            
+    
     app.register_blueprint(physician_blueprint.bp, url_prefix=f"{app.config['API_BASE_PATH']}v1.0/physician")    
     app.register_blueprint(patient_blueprint.bp, url_prefix=f"{app.config['API_BASE_PATH']}v1.0/patient")    
     app.register_blueprint(orders_blueprint.bp, url_prefix=f"{app.config['API_BASE_PATH']}v1.0/order")
     app.register_blueprint(exam_blueprint.bp, url_prefix=f"{app.config['API_BASE_PATH']}v1.0/exam")
+    app.register_blueprint(database_status_blueprint.bp, url_prefix=f"{app.config['API_BASE_PATH']}v1.0/database")
 
     # cors
     cors = CORS(app, resources={r"{}*".format(app.config['API_BASE_PATH'])},
