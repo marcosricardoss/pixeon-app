@@ -25,7 +25,7 @@ class Model:
         return {} # pragma: no cover
 
     def remove_session(self):
-        """Removes an object from the session its current session."""
+        """Removes an model from its current session."""
 
         from sqlalchemy import inspect
 
@@ -78,7 +78,7 @@ class User(Base, Model, CreationModificationDateMixin):
         return data
 
     def __repr__(self) -> str:
-        return '<User %r>' % (self.username)
+        return f'<User {self.username}>'        
 
 
 class Physician(Base, Model, CreationModificationDateMixin):
@@ -115,7 +115,7 @@ class Physician(Base, Model, CreationModificationDateMixin):
         return data
 
     def __repr__(self) -> str:
-        return '<Physician %r>' % (self.name)       
+        return f'<Physician {self.name}>'
 
 
 class Patient(Base, Model, CreationModificationDateMixin):
@@ -152,7 +152,7 @@ class Patient(Base, Model, CreationModificationDateMixin):
         return data
 
     def __repr__(self) -> str:
-        return '<Patient %r>' % (self.name)
+        return f'<Patient {self.name}>'        
 
 
 class Order(Base, Model, CreationModificationDateMixin):
@@ -189,6 +189,9 @@ class Order(Base, Model, CreationModificationDateMixin):
 
         return data
 
+    def __repr__(self) -> str:
+        return f'<Order {self.name}>'        
+
 
 class Exam(Base, Model, CreationModificationDateMixin):
     """ User's model class.
@@ -224,7 +227,7 @@ class Exam(Base, Model, CreationModificationDateMixin):
         return data
 
     def __repr__(self) -> str:
-        return '<Exam %r>' % (self.name)         
+        return f'<Exam {self.name}>'        
 
 
   
