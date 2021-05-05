@@ -43,6 +43,7 @@ def get_orders():
     offset, limit, sort, desc = get_default_query_args(request.args)
     
     # range date range paramenters    
+    from_time, to_time = None, None
     daterange = validate_date_range(request.args)    
     if not daterange:
         return make_response(jsonify({            

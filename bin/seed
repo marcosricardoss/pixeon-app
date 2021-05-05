@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+docker exec -it pixeon-app flask seed

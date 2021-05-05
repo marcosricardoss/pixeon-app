@@ -39,14 +39,14 @@ class CreationModificationDateMixin(object):
     updated_at = Column(DateTime())  
 
 
-association_exam_order = Table('exame_order', Base.metadata,
-                                Column('order_id', Integer, ForeignKey('order.id')),
-                                Column('exam_id', Integer, ForeignKey('exam.id')))
+# association_exam_order = Table('exame_order', Base.metadata,
+#                                 Column('order_id', Integer, ForeignKey('order.id')),
+#                                 Column('exam_id', Integer, ForeignKey('exam.id')))
 
 
-association_physician_exam = Table('physician_exame', Base.metadata,
-                                Column('physician_id', Integer, ForeignKey('physician.id')),
-                                Column('exam_id', Integer, ForeignKey('exam.id')))
+# association_physician_exam = Table('physician_exame', Base.metadata,
+#                                 Column('physician_id', Integer, ForeignKey('physician.id')),
+#                                 Column('exam_id', Integer, ForeignKey('exam.id')))
                                 
 
 class User(Base, Model, CreationModificationDateMixin):
@@ -156,6 +156,7 @@ class Patient(Base, Model, CreationModificationDateMixin):
             'name': self.name,
             'weight': self.weight,
             "height": self.height,
+            "BMI": f"{(self.weight / (self.height * self.height)):.2f}", 
             "created_at": self.created_at.astimezone(timezone).isoformat(),
             "updated_at": self.updated_at.astimezone(timezone).isoformat() if self.updated_at else ''            
         }
@@ -180,10 +181,8 @@ class Order(Base, Model, CreationModificationDateMixin):
 
     id = Column(Integer, primary_key=True)
     public_id = Column(String(50), unique=True, nullable=False)    
-    patient_id = Column(Integer, ForeignKey('patient.id'))
-    exams = relationship("Exam",
-                            secondary=association_exam_order,                            
-                            backref="orders")
+    patient_id = Column(Integer, ForeignKey('patient.id'))    
+    exams = relationship("Exam", backref='order')
 
     def serialize(self, timezone=UTC) -> dict:
         """Serialize the object attributes values into a dictionary.
@@ -193,9 +192,9 @@ class Order(Base, Model, CreationModificationDateMixin):
         """
 
         data = {
-            "public_id": self.public_id,            
-            # "patient": self.patient.name, 
-            "patient": self.patient.serialize(),
+            "public_id": self.public_id,                        
+            "patient": self.patient.serialize(), # "patient": self.patient.name, 
+            "exams": [e.serialize() for e in self.exams],
             "created_at": self.created_at.astimezone(timezone).isoformat(),
             "updated_at": self.updated_at.astimezone(timezone).isoformat() if self.updated_at else ''            
         }
@@ -222,6 +221,7 @@ class Exam(Base, Model, CreationModificationDateMixin):
     public_id = Column(String(50), unique=True, nullable=False)
     name = Column(String(250), nullable=False)        
     physician_id = Column(Integer, ForeignKey('physician.id'))
+    order_id = Column(Integer, ForeignKey('order.id'))
 
     def serialize(self, timezone=UTC) -> dict:
         """Serialize the object attributes values into a dictionary.
@@ -234,16 +234,13 @@ class Exam(Base, Model, CreationModificationDateMixin):
             "public_id": self.public_id,
             'name': self.name,
             "created_at": self.created_at.astimezone(timezone).isoformat(),
-            "updated_at": self.updated_at.astimezone(timezone).isoformat() if self.updated_at else '',
-            # "physician": [p.serialize() for p in self.physician],
+            "updated_at": self.updated_at.astimezone(timezone).isoformat() if self.updated_at else '',            
             "physician": self.physician.serialize(),
-            "order": [o.serialize() for o in self.orders]
+            "patient": self.order.patient.serialize(),
+            "order_id": self.order.public_id
         }
 
         return data
 
     def __repr__(self) -> str:
         return f'<Exam {self.name}>'        
-
-
-  

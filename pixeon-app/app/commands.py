@@ -1,11 +1,14 @@
 import uuid
 import click
+import names
+import dateutil
 
-from datetime import datetime, timedelta
 from typing import List
-
+from datetime import datetime, timedelta
 from flask.cli import with_appcontext
 
+from app.model import Exam, Patient, Order, Physician
+from app.model import PatientRepository, PhysicianRepository, OrderRepository, ExamRepository
 from app.exceptions import UserDataNotValid
 
 def register_commands(app):
@@ -57,6 +60,8 @@ def add_user(username: str, password: str) -> None:
         click.echo('API USER CREATED SUCCESSFULLY!')
     except UserDataNotValid as e:
         click.echo('API USER ALREADY REGISTERED.')       
+    except BaseException:
+        click.echo('ERROR CREATING API USER')    
 
 
 @click.command('seed')
@@ -75,69 +80,94 @@ def seed_func() -> None:
 
     Parameters:
     videos(object): a list os video objects.
-    """
-
-    import uuid
-    from app.model import Exam, Patient, Order, Physician
-    from app.model import PatientRepository, PhysicianRepository, OrderRepository
-
-    physician_repository = PhysicianRepository()
-    patient_repository = PatientRepository()
-    order_repository = OrderRepository()
-
+    """  
+    
     # Physicians
          
-    physician1 = Physician()
-    physician1.public_id = uuid.uuid1().hex
-    physician1.name = "Dra Jane Doe"
-
-    physician2 = Physician()
-    physician2.public_id = uuid.uuid1().hex
-    physician2.name = "Dra Jhon Doe"         
-
-    physician_repository.save(physician1)     
-    physician_repository.save(physician2)   
+    physician1 = create_physician('female')   
+    physician2 = create_physician('female')   
+    physician3 = create_physician('male')       
 
     # Patients
     
-    patient1 = Patient()
-    patient1.public_id = uuid.uuid1().hex
-    patient1.name = "Jane Doe" 
-    patient1.weight = 30
-    patient1.height = 1.60    
+    patient1 = create_patient("famale", 65, 1.68)     
+    patient2 = create_patient("famale", 72, 1.78)     
+    patient3 = create_patient("famale", 30, 1.60)   
+    patient4 = create_patient("male", 68, 1.70)     
+    patient5 = create_patient("male", 78, 1.78)     
+    patient6 = create_patient("male", 100, 1.78)     
     
-    patient2 = Patient()
-    patient2.public_id = uuid.uuid1().hex
-    patient2.name = "John Doe"
-    patient2.weight = 95
-    patient2.height = 1.78
 
-    patient_repository.save(patient1)
-    patient_repository.save(patient2)         
-    
-    # Patient's order        
+    # Patient's orderr        
 
     # order #1
-    patient1_order = Order()
-    patient1_order.public_id = uuid.uuid1().hex
-    patient1_order.patient_id = patient1.id
+    patient1_order = create_order(patient1)
+    patient2_order = create_order(patient2)
+    patient3_order = create_order(patient3)
+    patient4_order = create_order(patient4)
+    patient5_order = create_order(patient5, dateutil.parser.isoparse("2021-01-01T00:00:00Z"))
+    patient6_order = create_order(patient6, dateutil.parser.isoparse("2021-01-02T00:00:00Z"))    
 
-    exam1 = Exam()
-    exam1.public_id = uuid.uuid1().hex
-    exam1.name = "Exam 1"
-    exam1.physician_id = physician1.id
-    patient1_order.exams.append(exam1)        
+    # Patient's exames        
 
-    # order #2
-    patient2_order = Order()
-    patient2_order.public_id = uuid.uuid1().hex
-    patient2_order.patient_id = patient2.id
+    exam1 = create_exam(physician1, patient1_order)
+    exam2 = create_exam(physician2, patient2_order)
+    exam3 = create_exam(physician3, patient3_order)
+    exam4 = create_exam(physician1, patient4_order)
+    exam5 = create_exam(physician2, patient5_order)
+    exam6 = create_exam(physician3, patient6_order)    
+
+def create_physician(gender):
+    """  """
+
+    prefix = "Dra." if gender == "female" else "Dr."
+    physician = Physician()
+    physician.public_id = uuid.uuid1().hex
+    physician.name = f"{prefix} {names.get_full_name(gender=gender)}"    
+
+    repository = PhysicianRepository()
+    repository.save(physician)
     
-    exam2 = Exam()
-    exam2.public_id = uuid.uuid1().hex
-    exam2.name = "Exam 2"
-    exam2.physician_id = physician2.id
-    patient2_order.exams.append(exam2)
-    
-    order_repository.save(patient1_order)
-    order_repository.save(patient2_order)
+    return physician
+
+def create_patient(gender, weight, height):
+    """  """
+
+    patient = Patient()
+    patient.public_id = uuid.uuid1().hex
+    patient.name = names.get_full_name(gender=gender)
+    patient.weight = weight
+    patient.height = height  
+
+    repository = PatientRepository()
+    repository.save(patient)
+
+    return patient
+
+def create_order(patient, created_at=None):
+    """  """
+
+    patient_order = Order()
+    patient_order.public_id = uuid.uuid1().hex
+    patient_order.patient = patient    
+    if created_at:
+        patient_order.created_at = created_at  
+
+    repository = OrderRepository()
+    repository.save(patient_order)
+
+    return patient_order
+
+def create_exam(physician, patient_order):
+    """  """
+
+    exam = Exam()
+    exam.public_id = uuid.uuid1().hex
+    exam.name = f"Exame Name - {physician.name}"
+    exam.physician = physician
+    exam.order = patient_order  
+
+    repository = ExamRepository()
+    repository.save(exam)
+
+    return exam

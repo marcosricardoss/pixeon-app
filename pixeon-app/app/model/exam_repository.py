@@ -34,19 +34,24 @@ class ExamRepository(Repository):
         
         # custom query
         if pub_patient_id and pub_physician_id:
-            query = query.join(Exam.orders, Exam.physician).join(Order.patient).filter(Patient.public_id == pub_patient_id and Physician.public_id == pub_physician_id)
+            query = query.join(Exam.order, Exam.physician).join(Order.patient).filter(Patient.public_id == pub_patient_id and Physician.public_id == pub_physician_id)
         elif pub_patient_id:                      
-            query = query.join(Exam.orders).join(Order.patient).filter(Patient.public_id == pub_patient_id)            
+            query = query.join(Exam.order).join(Order.patient).filter(Patient.public_id == pub_patient_id)            
         elif pub_physician_id:                      
             query = query.join(Exam.physician).filter(Physician.public_id == pub_physician_id)
 
-        if bmi:
-            # bmi = weight / (height * height)                        
-            bmi = lambda p: p.weight / (p.height * p.height)
-            query = (query
-                     .join(Exam.orders)
-                     .join(Order.patient)
-                     .filter(or_(bmi(Patient) < 18.5, bmi(Patient) > 25)))                               
-        
+        if bmi:            
+            bmi_calc = lambda p: p.weight / (p.height * p.height)
+            if bmi == 'not normal':
+                query = (query
+                        .join(Exam.order)
+                        .join(Order.patient)
+                        .filter(or_(bmi_calc(Patient) < 18.5, bmi_calc(Patient) > 25)))                               
+            else:
+                query = (query
+                        .join(Exam.order)
+                        .join(Order.patient)
+                        .filter(bmi_calc(Patient) >= 18.5, bmi_calc(Patient) <= 25))                               
+
         querypage = self.get_query_paged(query, offset, limit)
-        return querypage, query.count()
+        return query, query.count()
