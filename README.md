@@ -7,6 +7,8 @@ The application is clustering using docker-compose needing only a few variables 
 
     docker-compose up -d (with the .env file in the same folder)
 
+    or
+
     docker-compose --env-file development.env up -d 
 
 Sample variable files already ready to be used to run the application.  
