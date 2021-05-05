@@ -101,9 +101,7 @@ class Physician(Base, Model, CreationModificationDateMixin):
     id = Column(Integer, primary_key=True)
     public_id = Column(String(50), unique=True, nullable=False)
     name = Column(String(250), nullable=False)            
-    exams = relationship("Exam",
-                            secondary=association_physician_exam,                            
-                            backref="physician")
+    exams = relationship("Exam", backref='physician')
 
     def serialize(self, timezone=UTC) -> dict:
         """Serialize the object attributes values into a dictionary.
@@ -223,6 +221,7 @@ class Exam(Base, Model, CreationModificationDateMixin):
     id = Column(Integer, primary_key=True)
     public_id = Column(String(50), unique=True, nullable=False)
     name = Column(String(250), nullable=False)        
+    physician_id = Column(Integer, ForeignKey('physician.id'))
 
     def serialize(self, timezone=UTC) -> dict:
         """Serialize the object attributes values into a dictionary.
@@ -236,7 +235,8 @@ class Exam(Base, Model, CreationModificationDateMixin):
             'name': self.name,
             "created_at": self.created_at.astimezone(timezone).isoformat(),
             "updated_at": self.updated_at.astimezone(timezone).isoformat() if self.updated_at else '',
-            "physician": [p.serialize() for p in self.physician],
+            # "physician": [p.serialize() for p in self.physician],
+            "physician": self.physician.serialize(),
             "order": [o.serialize() for o in self.orders]
         }
 
