@@ -42,6 +42,11 @@ class CreationModificationDateMixin(object):
 association_exam_order = Table('exame_order', Base.metadata,
                                 Column('order_id', Integer, ForeignKey('order.id')),
                                 Column('exam_id', Integer, ForeignKey('exam.id')))
+
+
+association_physician_exam = Table('physician_exame', Base.metadata,
+                                Column('physician_id', Integer, ForeignKey('physician.id')),
+                                Column('exam_id', Integer, ForeignKey('exam.id')))
                                 
 
 class User(Base, Model, CreationModificationDateMixin):
@@ -95,8 +100,10 @@ class Physician(Base, Model, CreationModificationDateMixin):
 
     id = Column(Integer, primary_key=True)
     public_id = Column(String(50), unique=True, nullable=False)
-    name = Column(String(250), nullable=False)        
-    exams = relationship("Exam", backref='physician')
+    name = Column(String(250), nullable=False)            
+    exams = relationship("Exam",
+                            secondary=association_physician_exam,                            
+                            backref="physician")
 
     def serialize(self, timezone=UTC) -> dict:
         """Serialize the object attributes values into a dictionary.
@@ -183,6 +190,7 @@ class Order(Base, Model, CreationModificationDateMixin):
 
         data = {
             "public_id": self.public_id,            
+            "patient": self.patient.name,
             "created_at": self.created_at.astimezone(timezone).isoformat(),
             "updated_at": self.updated_at.astimezone(timezone).isoformat() if self.updated_at else ''            
         }
@@ -190,7 +198,7 @@ class Order(Base, Model, CreationModificationDateMixin):
         return data
 
     def __repr__(self) -> str:
-        return f'<Order {self.name}>'        
+        return f'<Order {self.public_id}>'        
 
 
 class Exam(Base, Model, CreationModificationDateMixin):
@@ -207,8 +215,7 @@ class Exam(Base, Model, CreationModificationDateMixin):
 
     id = Column(Integer, primary_key=True)
     public_id = Column(String(50), unique=True, nullable=False)
-    name = Column(String(250), nullable=False)    
-    physician_id = Column(Integer, ForeignKey('physician.id'))
+    name = Column(String(250), nullable=False)        
 
     def serialize(self, timezone=UTC) -> dict:
         """Serialize the object attributes values into a dictionary.
@@ -221,7 +228,9 @@ class Exam(Base, Model, CreationModificationDateMixin):
             "public_id": self.public_id,
             'name': self.name,
             "created_at": self.created_at.astimezone(timezone).isoformat(),
-            "updated_at": self.updated_at.astimezone(timezone).isoformat() if self.updated_at else ''            
+            "updated_at": self.updated_at.astimezone(timezone).isoformat() if self.updated_at else '',
+            "physician": [p.serialize() for p in self.physician],
+            "order": [o.serialize() for o in self.orders]
         }
 
         return data

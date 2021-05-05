@@ -41,17 +41,9 @@ class Repository:
 
         return self.session.query(self.__model_class).filter_by(public_id=object_public_id).first()
 
-    def get_all(self, offset, limit, sort, dsc) -> List[object]:
-        """Retrieves a list of all elements in the database.
+    def get_all_defaul_query(self, query, sort, dsc):
+        """ # """  
 
-        Returns:
-        list[object]: a list of model objects.
-        """        
-
-        query = self.session.query(self.__model_class)
-        total = query.count()
-    
-        # sorting items
         if sort:
             if dsc:
                 order_by_arg = desc(self.__model_class.__table__.c[sort])
@@ -63,7 +55,12 @@ class Repository:
                 order_by_arg = desc(self.__model_class.id)
             else: 
                 order_by_arg = self.__model_class.id
-            query = query.order_by(order_by_arg)         
+            query = query.order_by(order_by_arg)    
+
+        return query     
+
+    def get_query_paged(self, query, offset, limit):
+        """ # """  
 
         # offset page
         if offset:
@@ -71,9 +68,21 @@ class Repository:
 
         # limit page
         if limit:
-            query = query.limit(limit)       
+            query = query.limit(limit)  
 
-        return query, total
+        return query
+
+    def get_all(self, offset, limit, sort, dsc) -> List[object]:
+        """Retrieves a list of all elements in the database.
+
+        Returns:
+        list[object]: a list of model objects.
+        """        
+
+        query = self.session.query(self.__model_class)
+        query = self.get_all_defaul_query(query, sort, dsc)      
+        querypage = self.get_query_paged(query, offset, limit)
+        return querypage, query.count()
 
     def save(self, obj: object) -> None:
         """Saves a model in the database.
