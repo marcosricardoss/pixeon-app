@@ -1,11 +1,16 @@
 import os
 import re
 import json
+import uuid
+import names
 
 from functools import wraps
 from jsonschema import Draft7Validator, draft7_format_checker
 
 from flask import Flask, abort, request, make_response, jsonify
+
+from app.model import Exam, Patient, Order, Physician
+from app.model import PatientRepository, PhysicianRepository, OrderRepository, ExamRepository
 
 iso_regex_date = r'^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$'
 match_regex_date = re.compile(iso_regex_date).match
@@ -135,3 +140,62 @@ def validate_iso_date(value):
             return True
     except:        
         return False
+
+
+def create_physician(gender):
+    """  """
+
+    prefix = "Dra." if gender == "female" else "Dr."
+    physician = Physician()
+    physician.public_id = uuid.uuid1().hex
+    physician.name = f"{prefix} {names.get_full_name(gender=gender)}"    
+
+    repository = PhysicianRepository()
+    repository.save(physician)
+    
+    return physician
+
+
+def create_patient(gender, weight, height):
+    """  """
+
+    patient = Patient()
+    patient.public_id = uuid.uuid1().hex
+    patient.name = names.get_full_name(gender=gender)
+    patient.weight = weight
+    patient.height = height  
+
+    repository = PatientRepository()
+    repository.save(patient)
+
+    return patient
+
+
+def create_order(patient, created_at=None):
+    """  """
+
+    patient_order = Order()
+    patient_order.public_id = uuid.uuid1().hex
+    patient_order.patient = patient    
+    if created_at:
+        patient_order.created_at = created_at  
+
+    repository = OrderRepository()
+    repository.save(patient_order)
+
+    return patient_order
+
+
+def create_exam(physician, patient_order):
+    """  """
+
+    exam = Exam()
+    exam.public_id = uuid.uuid1().hex
+    exam.name = f"Exame Name - {physician.name}"
+    exam.physician = physician
+    exam.order = patient_order  
+
+    repository = ExamRepository()
+    repository.save(exam)
+
+    return exam        

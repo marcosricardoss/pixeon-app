@@ -1,15 +1,13 @@
 import uuid
 import click
-import names
 import dateutil
 
 from typing import List
 from datetime import datetime, timedelta
 from flask.cli import with_appcontext
 
-from app.model import Exam, Patient, Order, Physician
-from app.model import PatientRepository, PhysicianRepository, OrderRepository, ExamRepository
 from app.exceptions import UserDataNotValid
+from app.util import create_physician, create_patient, create_order, create_exam
 
 def register_commands(app):
     """Add commands to the line command input.
@@ -95,12 +93,10 @@ def seed_func() -> None:
     patient3 = create_patient("famale", 30, 1.60)   
     patient4 = create_patient("male", 68, 1.70)     
     patient5 = create_patient("male", 78, 1.78)     
-    patient6 = create_patient("male", 100, 1.78)     
-    
+    patient6 = create_patient("male", 100, 1.78)   
 
-    # Patient's orderr        
-
-    # order #1
+    # Patient's orders
+        
     patient1_order = create_order(patient1)
     patient2_order = create_order(patient2)
     patient3_order = create_order(patient3)
@@ -117,57 +113,3 @@ def seed_func() -> None:
     exam5 = create_exam(physician2, patient5_order)
     exam6 = create_exam(physician3, patient6_order)    
 
-def create_physician(gender):
-    """  """
-
-    prefix = "Dra." if gender == "female" else "Dr."
-    physician = Physician()
-    physician.public_id = uuid.uuid1().hex
-    physician.name = f"{prefix} {names.get_full_name(gender=gender)}"    
-
-    repository = PhysicianRepository()
-    repository.save(physician)
-    
-    return physician
-
-def create_patient(gender, weight, height):
-    """  """
-
-    patient = Patient()
-    patient.public_id = uuid.uuid1().hex
-    patient.name = names.get_full_name(gender=gender)
-    patient.weight = weight
-    patient.height = height  
-
-    repository = PatientRepository()
-    repository.save(patient)
-
-    return patient
-
-def create_order(patient, created_at=None):
-    """  """
-
-    patient_order = Order()
-    patient_order.public_id = uuid.uuid1().hex
-    patient_order.patient = patient    
-    if created_at:
-        patient_order.created_at = created_at  
-
-    repository = OrderRepository()
-    repository.save(patient_order)
-
-    return patient_order
-
-def create_exam(physician, patient_order):
-    """  """
-
-    exam = Exam()
-    exam.public_id = uuid.uuid1().hex
-    exam.name = f"Exame Name - {physician.name}"
-    exam.physician = physician
-    exam.order = patient_order  
-
-    repository = ExamRepository()
-    repository.save(exam)
-
-    return exam
