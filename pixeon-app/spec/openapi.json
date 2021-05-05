@@ -743,6 +743,17 @@
               ]
             },
             "description": "Indicates the order sort"
+          },
+          {
+            "in": "query",
+            "name": "bmi",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "normal"
+              ]
+            },
+            "description": "Selected patients according to BMI"
           }
         ],
         "responses": {
@@ -842,6 +853,24 @@
               ]
             },
             "description": "Indicates the order sort"
+          },
+          {
+            "in": "query",
+            "name": "from_time",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "The initial data-time of the time range of the orders to be selected"
+          },
+          {
+            "in": "query",
+            "name": "to_time",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": "The final data-time of the time range of the orders to be selected."
           }
         ],
         "responses": {
@@ -941,6 +970,22 @@
               ]
             },
             "description": "Indicates the order sort"
+          },
+          {
+            "in": "query",
+            "name": "patient_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The public id of the patient who wants to see the exams"
+          },
+          {
+            "in": "query",
+            "name": "physician_id",
+            "schema": {
+              "type": "string"
+            },
+            "description": "The public id of the physician who wants to see the exams"
           }
         ],
         "responses": {
