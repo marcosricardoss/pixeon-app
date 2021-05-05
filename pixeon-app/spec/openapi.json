@@ -982,7 +982,7 @@
             "schema": {
               "type": "string",
               "enum": [
-                "normal"
+                "not normal"
               ]
             },
             "description": "Selected exames according to the patient's BMI"
