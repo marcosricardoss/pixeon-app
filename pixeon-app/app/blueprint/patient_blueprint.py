@@ -12,7 +12,7 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity
 )
 from app.model import Patient, PatientRepository
-from app.util import validate_list_query
+from app.util import validate_list_query, get_default_query_args
 
 bp = Blueprint('patient', __name__)
 
@@ -26,10 +26,8 @@ def get_patients():
     response: flask.Response object with the application/json mimetype.
     """
 
-    offset = int(request.args.get('offset')) if request.args.get('offset') else None
-    limit = int(request.args.get('limit')) if request.args.get('limit') else None
-    sort = request.args.get('sort')
-    desc = request.args.get('desc')
+    # default paramenters
+    offset, limit, sort, desc = get_default_query_args(request.args)
 
     patient_repository = PatientRepository()
     patients, total = patient_repository.get_all(offset, limit, sort, desc)

@@ -2,7 +2,7 @@
 to the '/order' endpoint of HTTP REST API.
 """
 import uuid
-from _datetime import datetime
+import dateutil.parser
 from pytz.reference import UTC
 
 from flask import (
@@ -12,9 +12,22 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity
 )
 from app.model import Order, OrderRepository
-from app.util import validate_list_query
+from app.util import validate_list_query, validate_iso_date, get_default_query_args
 
 bp = Blueprint('order', __name__)
+
+def validate_date_range(values):
+    from_time_str = values.get('from_time')
+    to_time_str = values.get('to_time')
+    
+    if from_time_str and validate_iso_date(from_time_str):    
+        if to_time_str and validate_iso_date(to_time_str):                    
+            from_time = dateutil.parser.isoparse(request.args.get('from_time'))        
+            to_time = dateutil.parser.isoparse(request.args.get('to_time'))   
+            return from_time, to_time
+        else: 
+            return False
+    return True
 
 @bp.route('', methods=('GET',))
 @jwt_required
@@ -26,20 +39,29 @@ def get_orders():
     response: flask.Response object with the application/json mimetype.
     """
 
-    offset = int(request.args.get('offset')) if request.args.get('offset') else None
-    limit = int(request.args.get('limit')) if request.args.get('limit') else None
-    sort = request.args.get('sort')
-    desc = request.args.get('desc')
+    # default paramenters
+    offset, limit, sort, desc = get_default_query_args(request.args)
+    
+    # range date range paramenters    
+    daterange = validate_date_range(request.args)    
+    if not daterange:
+        return make_response(jsonify({            
+            'msg': "The given date range is invalid"    
+        }), 400)    
+    if isinstance(daterange, tuple):
+        from_time, to_time = daterange 
 
     order_repository = OrderRepository()
-    orders, total = order_repository.get_all(offset, limit, sort, desc)
+    orders, total = order_repository.get_all(offset, limit, sort, desc, from_time, to_time)
 
     return make_response(jsonify({        
         "metadata": {
             "type": "list",
             "offset": offset,
             "limit": limit,
-            "total": total
+            "total": total,
+            "from_time": from_time,
+            "to_time": to_time
         },
         'orders': [order.serialize() for order in orders]
     }), 200)

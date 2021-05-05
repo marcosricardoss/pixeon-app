@@ -13,7 +13,7 @@ from flask_jwt_extended import (
 )
 from app.model import User, UserRepository
 from app.util import ( 
-    validate_json, validate_schema, validate_list_query
+    validate_json, validate_schema, validate_list_query, get_default_query_args
 )
 from .schemas import user
 
@@ -29,10 +29,7 @@ def get_users():
     response: flask.Response object with the application/json mimetype.
     """
 
-    offset = int(request.args.get('offset')) if request.args.get('offset') else None
-    limit = int(request.args.get('limit')) if request.args.get('limit') else None
-    sort = request.args.get('sort')
-    desc = request.args.get('desc')    
+    offset, limit, sort, desc = get_default_query_args(request.args)
 
     user_repository = UserRepository()
     users, total = user_repository.get_all(offset, limit, sort, desc)

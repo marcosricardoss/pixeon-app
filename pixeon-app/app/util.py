@@ -1,4 +1,5 @@
 import os
+import re
 import json
 
 from functools import wraps
@@ -6,6 +7,8 @@ from jsonschema import Draft7Validator, draft7_format_checker
 
 from flask import Flask, abort, request, make_response, jsonify
 
+iso_regex_date = r'^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$'
+match_regex_date = re.compile(iso_regex_date).match
 
 def validate_json(multipart=False):
     def decorator(f):
@@ -61,6 +64,8 @@ def validate_list_query(sort_values):
         @wraps(f)
         def wrapper(*args, **kw):
 
+            # default values
+
             offset = request.args.get('offset')
             limit = request.args.get('limit')
             sort = request.args.get('sort')
@@ -81,6 +86,15 @@ def validate_list_query(sort_values):
             return f(*args, **kw)
         return wrapper
     return decorator
+
+
+def get_default_query_args(values):    
+    offset = int(values.get('offset')) if values.get('offset') else None
+    limit = int(values.get('limit')) if values.get('limit') else None
+    sort = values.get('sort')
+    desc = values.get('desc')
+
+    return offset, limit, sort, desc
 
 
 def load_config(app: Flask, test_config) -> None:
@@ -113,3 +127,11 @@ def init_instance_folder(app: Flask) -> None:
         os.makedirs(app.instance_path)
     except OSError:
         pass
+
+
+def validate_iso_date(value):
+    try:            
+        if match_regex_date(value) is not None:
+            return True
+    except:        
+        return False
