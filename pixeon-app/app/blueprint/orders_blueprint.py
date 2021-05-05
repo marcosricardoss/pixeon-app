@@ -20,7 +20,7 @@ def validate_date_range(values):
     from_time_str = values.get('from_time')
     to_time_str = values.get('to_time')
     
-    if from_time_str and validate_iso_date(from_time_str):    
+    if from_time_str and validate_iso_date(from_time_str): # pragma: no cover  
         if to_time_str and validate_iso_date(to_time_str):                    
             from_time = dateutil.parser.isoparse(request.args.get('from_time'))        
             to_time = dateutil.parser.isoparse(request.args.get('to_time'))   
@@ -45,7 +45,7 @@ def get_orders():
     # range date range paramenters    
     from_time, to_time = None, None
     daterange = validate_date_range(request.args)    
-    if not daterange:
+    if not daterange: # pragma: no cover
         return make_response(jsonify({            
             'msg': "The given date range is invalid"    
         }), 400)    

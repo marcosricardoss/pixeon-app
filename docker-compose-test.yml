@@ -1,0 +1,33 @@
+version: "3.2"
+services:
+  pixeon-app:
+    container_name: pixeon-app-testing
+    restart: always
+    build:
+      context: ./pixeon-app
+      args:
+        BUILD_ENV: $ENV                 
+    image: pixeon-app:latest 
+    environment:      
+      APP_DEFAULT_PASS: $APP_DEFAULT_PASS
+      APP_DEFAULT_USERNAME: $APP_DEFAULT_USERNAME
+      DATABASE_NAME: $POSTGRES_SERVICE_DATABASE_NAME
+      DATABASE_PASSWORD: $POSTGRES_SERVICE_PASSWORD
+      DATABASE_URL: "sqlite:////usr/src/pixeon/data/database-testing.db" 
+      FLASK_APP: app
+      FLASK_ENV: development
+      FLASK_PORT: 5000                        
+      SECRET_KEY: $SECRET_KEY
+      VIRTUAL_HOST: "${APP_SERVICE_HOST}.${DOMAIN}"
+      VIRTUAL_PORT: 5000
+    command: python -m flask run --host=0.0.0.0 --port=5000
+    volumes:      
+      - "./pixeon-app/app:/usr/src/pixeon/app"
+      - "./pixeon-app/data:/usr/src/pixeon/data"
+      - "./pixeon-app/migrations:/usr/src/pixeon/migrations"
+      - "./pixeon-app/instance:/usr/src/pixeon/instance"
+      - "./pixeon-app/tests:/usr/src/pixeon/tests"
+      - "./pixeon-app/spec:/usr/src/pixeon/spec"
+      - "./pixeon-app/htmlcov:/usr/src/pixeon/htmlcov"
+    ports:
+      - "${APP_SERVICE_PORT}:5000"    

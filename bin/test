@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+docker exec pixeon-app-testing coverage run -m pytest
+docker exec pixeon-app-testing coverage report

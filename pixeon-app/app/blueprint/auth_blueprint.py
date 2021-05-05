@@ -54,7 +54,7 @@ def login() -> Response:
 
 @bp.route('/refresh', methods=['POST'])
 @jwt_refresh_token_required
-def refresh():
+def refresh(): # pragma: no cover
     """Create a new access token.
     Returns:
         response: flask.Response object with the application/json mimetype.
