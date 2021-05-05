@@ -9,7 +9,7 @@ import pytz
 from datetime import datetime
 from pytz.reference import UTC
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Float
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -132,6 +132,8 @@ class Patient(Base, Model, CreationModificationDateMixin):
     id              (interger, primary key)
     public_id*      (str): public ID
     name*           (string)
+    weight*         (Float)
+    height*         (Float)
     
     """
 
@@ -140,6 +142,8 @@ class Patient(Base, Model, CreationModificationDateMixin):
     id = Column(Integer, primary_key=True)
     public_id = Column(String(50), unique=True, nullable=False)
     name = Column(String(250), nullable=False)    
+    weight = Column(Float(), nullable=False)
+    height = Column(Float(), nullable=False)
     orders = relationship("Order", backref='patient')
 
     def serialize(self, timezone=UTC) -> dict:
@@ -152,6 +156,8 @@ class Patient(Base, Model, CreationModificationDateMixin):
         data = {
             "public_id": self.public_id,
             'name': self.name,
+            'weight': self.weight,
+            "height": self.height,
             "created_at": self.created_at.astimezone(timezone).isoformat(),
             "updated_at": self.updated_at.astimezone(timezone).isoformat() if self.updated_at else ''            
         }
@@ -190,7 +196,8 @@ class Order(Base, Model, CreationModificationDateMixin):
 
         data = {
             "public_id": self.public_id,            
-            "patient": self.patient.name,
+            # "patient": self.patient.name, 
+            "patient": self.patient.serialize(),
             "created_at": self.created_at.astimezone(timezone).isoformat(),
             "updated_at": self.updated_at.astimezone(timezone).isoformat() if self.updated_at else ''            
         }

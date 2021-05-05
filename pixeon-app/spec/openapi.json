@@ -743,17 +743,6 @@
               ]
             },
             "description": "Indicates the order sort"
-          },
-          {
-            "in": "query",
-            "name": "bmi",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "normal"
-              ]
-            },
-            "description": "Selected patients according to BMI"
           }
         ],
         "responses": {
@@ -986,6 +975,17 @@
               "type": "string"
             },
             "description": "The public id of the physician who wants to see the exams"
+          },
+          {
+            "in": "query",
+            "name": "bmi",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "normal"
+              ]
+            },
+            "description": "Selected exames according to the patient's BMI"
           }
         ],
         "responses": {

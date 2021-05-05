@@ -32,16 +32,19 @@ def get_exams():
     patient_id = request.args.get('patient_id')
     # Physician Id
     physician_id = request.args.get('physician_id')
+    # BMI
+    bmi = request.args.get('bmi')
 
     exam_repository = ExamRepository()
-    exams, total = exam_repository.get_all(offset, limit, sort, desc, patient_id, physician_id)
+    exams, total = exam_repository.get_all(offset, limit, sort, desc, patient_id, physician_id, bmi)
 
     return make_response(jsonify({        
         "metadata": {
             "type": "list",
             "offset": offset,
             "limit": limit,
-            "total": total
+            "total": total, 
+            "BMI": bmi
         },
         'exams': [exam.serialize() for exam in exams]
     }), 200)
