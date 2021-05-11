@@ -46,6 +46,7 @@ def get_users():
 
 
 @bp.route('', methods=('POST',))
+@jwt_required
 @validate_json()
 @validate_schema(user)
 def add_user() -> Response:
@@ -80,6 +81,7 @@ def add_user() -> Response:
 
 
 @bp.route('/<string:user_id>', methods=('GET',))
+@jwt_required
 def get_user_by_id(user_id):
     """Retrieves user by public ID.
 
@@ -100,6 +102,7 @@ def get_user_by_id(user_id):
 
 
 @bp.route('/<string:user_id>', methods=('PUT',))
+@jwt_required
 @validate_json()
 @validate_schema(user)
 def update_user_by_id(user_id):
@@ -139,6 +142,7 @@ def update_user_by_id(user_id):
 
 
 @bp.route('/<string:station_id>', methods=('DELETE',))
+@jwt_required
 def delete_user_by_id(station_id):
     """Deletes a user by public ID.
 
